@@ -1,7 +1,10 @@
 package com.example.demo.controller;
 
 import com.example.demo.entity.Client;
+import com.example.demo.entity.Facture;
+import com.example.demo.entity.LigneFacture;
 import com.example.demo.service.ClientService;
+import com.example.demo.service.FactureService;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -18,6 +21,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Controlleur pour réaliser les exports.
@@ -28,6 +32,9 @@ public class ExportController {
 
     @Autowired
     private ClientService clientService;
+
+    @Autowired
+    private FactureService factureService;
 
     @GetMapping("/clients/csv")
     public void clientsCSV(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -44,10 +51,75 @@ public class ExportController {
         }
     }
 
-    @GetMapping("/clients/xlsx")
+    @GetMapping("/factures/xlsx")
     public void clientsXLSX(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setContentType("application/vnd.ms-excel");
         response.setHeader("Content-Disposition", "attachment; filename=\"fichierXlsx.xlsx\"");
+
+        List<Facture> listFacture = factureService.findAllFacture();
+
+        Workbook workbook = new XSSFWorkbook();
+
+//        for(int i = 0; i < listFacture.size(); i++){
+        int j = 0;
+        for(Facture facture : listFacture){
+            Sheet sheet = workbook.createSheet("Facture" + j);
+
+            Set<LigneFacture> lignes = facture.getLigne();
+            int i = 0;
+            double total = 0;
+
+            Row headerRow = sheet.createRow(0);
+
+            Cell cellId = headerRow.createCell(0);
+            Cell cellNom = headerRow.createCell(1);
+            Cell cellQuantite = headerRow.createCell(2);
+            Cell cellPrixU = headerRow.createCell(3);
+            Cell cellPrix = headerRow.createCell(4);
+
+            cellId.setCellValue("Id");
+            cellNom.setCellValue("Désignation");
+            cellQuantite.setCellValue("Quantité");
+            cellPrixU.setCellValue("Prix Unitaire");
+            cellPrix.setCellValue("Prix Ligne");
+
+            for(LigneFacture ligne : lignes){
+                i++;
+                Row row = sheet.createRow(i);
+
+                Cell cId = row.createCell(0);
+                cId.setCellValue(ligne.getId());
+
+                Cell cNom = row.createCell(1);
+                cNom.setCellValue(ligne.getArticle().getLibelle());
+
+                Cell cQuantite = row.createCell(2);
+                cQuantite.setCellValue(ligne.getQuantite());
+
+                Cell cPrixU = row.createCell(3);
+                cPrixU.setCellValue(ligne.getArticle().getPrix());
+
+                Cell cPrix = row.createCell(4);
+                cPrix.setCellValue(ligne.getArticle().getPrix() * ligne.getQuantite());
+
+                total += (ligne.getArticle().getPrix() * ligne.getQuantite());
+            }
+            Row rowFinal = sheet.createRow(i+2);
+            Cell cellTitre = rowFinal.createCell(3);
+            cellTitre.setCellValue("Total :");
+            Cell cellTotal = rowFinal.createCell(4);
+            cellTotal.setCellValue(total);
+            j++;
+        }
+
+        workbook.write(response.getOutputStream());
+        workbook.close();
+    }
+
+    @GetMapping("/clients/xlsx")
+    public void factureXLSX(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        response.setContentType("application/vnd.ms-excel");
+        response.setHeader("Content-Disposition", "attachment; filename=\"factureXlsx.xlsx\"");
 
         List<Client> listClient = clientService.findAllClients();
 
