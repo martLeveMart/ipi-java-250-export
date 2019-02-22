@@ -9,6 +9,9 @@ public class Facture {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
+    @ManyToOne
+    private Client client;
+
     @OneToMany(mappedBy = "facture")
     private Set<LigneFacture> lignes;
 
@@ -34,5 +37,13 @@ public class Facture {
 
     public void setLigne(Set<LigneFacture> lignes) {
         this.lignes = lignes;
+    }
+
+    public Client getClient() {
+        return client;
+    }
+
+    public void setClient(Client client) {
+        this.client = client;
     }
 }
