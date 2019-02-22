@@ -1,9 +1,6 @@
 package com.example.demo.entity;
 
-import javax.persistence.Column;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.util.Set;
 
 public class Facture {
@@ -12,12 +9,15 @@ public class Facture {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    //????
-    private Set<LigneFacture> ligne;
+    @OneToMany(mappedBy = "facture")
+    private Set<LigneFacture> lignes;
 
     public double getTotal(){
-        //TODO
-        return 0;
+        double prixTotal = 0;
+        for(LigneFacture ligne : lignes){
+            prixTotal += ligne.getArticle().getPrix() * ligne.getQuantite();
+        }
+        return prixTotal;
     }
 
     public Long getId() {
@@ -29,10 +29,10 @@ public class Facture {
     }
 
     public Set<LigneFacture> getLigne() {
-        return ligne;
+        return lignes;
     }
 
-    public void setLigne(Set<LigneFacture> ligne) {
-        this.ligne = ligne;
+    public void setLigne(Set<LigneFacture> lignes) {
+        this.lignes = lignes;
     }
 }

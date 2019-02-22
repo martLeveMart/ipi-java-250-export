@@ -1,9 +1,6 @@
 package com.example.demo.entity;
 
-import javax.persistence.Column;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 public class LigneFacture {
 
@@ -11,7 +8,10 @@ public class LigneFacture {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    //????
+    @ManyToOne
+    private Facture facture;
+
+   @ManyToOne
     private Article article;
 
     @Column
@@ -39,5 +39,13 @@ public class LigneFacture {
 
     public void setQuantite(int quantite) {
         this.quantite = quantite;
+    }
+
+    public Facture getFacture() {
+        return facture;
+    }
+
+    public void setFacture(Facture facture) {
+        this.facture = facture;
     }
 }
