@@ -1,6 +1,12 @@
 package com.example.demo.controller;
 
+import com.example.demo.entity.Client;
 import com.example.demo.service.ClientService;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -10,6 +16,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.time.LocalDate;
+import java.util.List;
 
 /**
  * Controlleur pour réaliser les exports.
@@ -26,9 +34,57 @@ public class ExportController {
         response.setContentType("text/csv");
         response.setHeader("Content-Disposition", "attachment; filename=\"clients.csv\"");
         PrintWriter writer = response.getWriter();
-        // TODO
-        writer.println("Case00;Case01");
-        writer.println("Case10;Case11");
+
+        List<Client> listClient = clientService.findAllClients();
+
+        writer.println("id;nom;prenom;date de naissance; age");
+        for(Client client : listClient){
+            writer.println(client.getId() + ";" + client.getNom() + ";" + client.getPrenom()
+                    + ";" + client.getDateNaissance().toString() + ";" + Integer.toString(client.getAge()));
+        }
     }
 
+    @GetMapping("/clients/xlsx")
+    public void clientsXLSX(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        response.setContentType("application/vnd.ms-excel");
+        response.setHeader("Content-Disposition", "attachment; filename=\"fichierXlsx.xlsx\"");
+
+        List<Client> listClient = clientService.findAllClients();
+
+        Workbook workbook = new XSSFWorkbook();
+        Sheet sheet = workbook.createSheet("Clients");
+        Row headerRow = sheet.createRow(0);
+        Cell cellId = headerRow.createCell(0);
+        Cell cellNom = headerRow.createCell(1);
+        Cell cellPrenom = headerRow.createCell(2);
+        Cell cellDate = headerRow.createCell(3);
+        Cell cellAge = headerRow.createCell(4);
+        cellId.setCellValue("Id");
+        cellNom.setCellValue("Nom");
+        cellPrenom.setCellValue("Prénom");
+        cellDate.setCellValue("Date de naissance");
+        cellAge.setCellValue("Age");
+
+        for(int i = 0; i < listClient.size(); i++){
+            Row ligne = sheet.createRow(i + 1);
+
+            Cell cId = ligne.createCell(0);
+            cId.setCellValue(listClient.get(i).getId());
+
+            Cell cNom = ligne.createCell(1);
+            cNom.setCellValue(listClient.get(i).getNom());
+
+            Cell cPrenom = ligne.createCell(2);
+            cPrenom.setCellValue(listClient.get(i).getPrenom());
+
+            Cell cDate = ligne.createCell(3);
+            cDate.setCellValue(listClient.get(i).getDateNaissance().toString());
+
+            Cell cAge = ligne.createCell(4);
+            cAge.setCellValue(Integer.toString(listClient.get(i).getAge()));
+        }
+
+        workbook.write(response.getOutputStream());
+        workbook.close();
+    }
 }
