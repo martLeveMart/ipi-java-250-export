@@ -1,3 +1,5 @@
+J'avais pas vu qu'il fallait ajouter le numéro de la facture dans le nom des onglets.
+
 # Fonctionnement
 Ouvrir le projet dans eclipse ou intellij.
 Démarrer l'application avec la classe 'main' : com.example.demo.DemoApplication
