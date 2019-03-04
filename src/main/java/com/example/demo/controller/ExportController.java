@@ -115,16 +115,12 @@ public class ExportController {
                 font.setColor(IndexedColors.RED.getIndex());
                 style.setFont(font);
 
-//                style.setFillForegroundColor(IndexedColors.RED.getIndex());
-//                style.setFillPattern(FillPatternType.SOLID_FOREGROUND);
-//                style.setBorderBottom(BorderStyle.THICK);
-//                style.setBottomBorderColor(IndexedColors.YELLOW.getIndex());
-//                style.setBorderLeft(BorderStyle.THICK);
-//                style.setLeftBorderColor(IndexedColors.YELLOW.getIndex());
-//                style.setBorderRight(BorderStyle.THICK);
-//                style.setRightBorderColor(IndexedColors.YELLOW.getIndex());
-//                style.setBorderTop(BorderStyle.MEDIUM_DASHED);
-//                style.setTopBorderColor(IndexedColors.YELLOW.getIndex());
+                style.setFillForegroundColor(IndexedColors.WHITE.getIndex());
+                style.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+                style.setBorderBottom(BorderStyle.THICK);
+                style.setBorderLeft(BorderStyle.THICK);
+                style.setBorderRight(BorderStyle.THICK);
+                style.setBorderTop(BorderStyle.MEDIUM_DASHED);
                 cellTotal.setCellStyle(style);
                 j++;
             }
