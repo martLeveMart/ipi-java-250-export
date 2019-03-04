@@ -120,7 +120,7 @@ public class ExportController {
                 style.setBorderBottom(BorderStyle.THICK);
                 style.setBorderLeft(BorderStyle.THICK);
                 style.setBorderRight(BorderStyle.THICK);
-                style.setBorderTop(BorderStyle.MEDIUM_DASHED);
+                style.setBorderTop(BorderStyle.THICK);
                 cellTotal.setCellStyle(style);
                 j++;
             }
