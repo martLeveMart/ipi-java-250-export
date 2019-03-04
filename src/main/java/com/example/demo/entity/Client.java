@@ -3,6 +3,7 @@ package com.example.demo.entity;
 import javax.persistence.*;
 import java.time.LocalDate;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by Alexandre on 09/04/2018.
@@ -22,6 +23,9 @@ public class Client {
 
     @Column
     private LocalDate dateNaissance;
+
+    @OneToMany(mappedBy = "client")
+    private List<Facture> facture;
 
     public Long getId() {
         return id;
@@ -53,6 +57,14 @@ public class Client {
 
     public void setDateNaissance(LocalDate dateNaissance) {
         this.dateNaissance = dateNaissance;
+    }
+
+    public List<Facture> getFacture() {
+        return facture;
+    }
+
+    public void setFacture(List<Facture> facture) {
+        this.facture = facture;
     }
 
     public int getAge(){

@@ -5,10 +5,7 @@ import com.example.demo.entity.Facture;
 import com.example.demo.entity.LigneFacture;
 import com.example.demo.service.ClientService;
 import com.example.demo.service.FactureService;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -56,61 +53,85 @@ public class ExportController {
         response.setContentType("application/vnd.ms-excel");
         response.setHeader("Content-Disposition", "attachment; filename=\"fichierXlsx.xlsx\"");
 
-        List<Facture> listFacture = factureService.findAllFacture();
+        List<Client> listClient = clientService.findAllClients();
 
         Workbook workbook = new XSSFWorkbook();
 
-//        for(int i = 0; i < listFacture.size(); i++){
-        int j = 0;
-        for(Facture facture : listFacture){
-            Sheet sheet = workbook.createSheet("Facture" + j);
+        for (Client client : listClient){
+            Sheet sheetClient = workbook.createSheet(client.getNom());
 
-            Set<LigneFacture> lignes = facture.getLigne();
-            int i = 0;
-            double total = 0;
+            List<Facture> listFacture = client.getFacture();
+            int j = 1;
+            for(Facture facture : listFacture) {
+                Sheet sheet = workbook.createSheet("Facture de " + client.getNom() + " n°"+ j);
 
-            Row headerRow = sheet.createRow(0);
+                Set<LigneFacture> lignes = facture.getLigne();
+                int i = 0;
+                double total = 0;
 
-            Cell cellId = headerRow.createCell(0);
-            Cell cellNom = headerRow.createCell(1);
-            Cell cellQuantite = headerRow.createCell(2);
-            Cell cellPrixU = headerRow.createCell(3);
-            Cell cellPrix = headerRow.createCell(4);
+                Row headerRow = sheet.createRow(0);
 
-            cellId.setCellValue("Id");
-            cellNom.setCellValue("Désignation");
-            cellQuantite.setCellValue("Quantité");
-            cellPrixU.setCellValue("Prix Unitaire");
-            cellPrix.setCellValue("Prix Ligne");
+                Cell cellId = headerRow.createCell(0);
+                Cell cellNom = headerRow.createCell(1);
+                Cell cellQuantite = headerRow.createCell(2);
+                Cell cellPrixU = headerRow.createCell(3);
+                Cell cellPrix = headerRow.createCell(4);
 
-            for(LigneFacture ligne : lignes){
-                i++;
-                Row row = sheet.createRow(i);
+                cellId.setCellValue("Id");
+                cellNom.setCellValue("Désignation");
+                cellQuantite.setCellValue("Quantité");
+                cellPrixU.setCellValue("Prix Unitaire");
+                cellPrix.setCellValue("Prix Ligne");
 
-                Cell cId = row.createCell(0);
-                cId.setCellValue(ligne.getId());
+                for (LigneFacture ligne : lignes) {
+                    i++;
+                    Row row = sheet.createRow(i);
 
-                Cell cNom = row.createCell(1);
-                cNom.setCellValue(ligne.getArticle().getLibelle());
+                    Cell cId = row.createCell(0);
+                    cId.setCellValue(ligne.getId());
 
-                Cell cQuantite = row.createCell(2);
-                cQuantite.setCellValue(ligne.getQuantite());
+                    Cell cNom = row.createCell(1);
+                    cNom.setCellValue(ligne.getArticle().getLibelle());
 
-                Cell cPrixU = row.createCell(3);
-                cPrixU.setCellValue(ligne.getArticle().getPrix());
+                    Cell cQuantite = row.createCell(2);
+                    cQuantite.setCellValue(ligne.getQuantite());
 
-                Cell cPrix = row.createCell(4);
-                cPrix.setCellValue(ligne.getArticle().getPrix() * ligne.getQuantite());
+                    Cell cPrixU = row.createCell(3);
+                    cPrixU.setCellValue(ligne.getArticle().getPrix());
 
-                total += (ligne.getArticle().getPrix() * ligne.getQuantite());
+                    Cell cPrix = row.createCell(4);
+                    cPrix.setCellValue(ligne.getArticle().getPrix() * ligne.getQuantite());
+
+                    total += (ligne.getArticle().getPrix() * ligne.getQuantite());
+                }
+                Row rowFinal = sheet.createRow(i + 2);
+                Cell cellTitre = rowFinal.createCell(3);
+                cellTitre.setCellValue("Total :");
+                Cell cellTotal = rowFinal.createCell(4);
+                cellTotal.setCellValue(total);
+                CellStyle style = workbook.createCellStyle();
+                Font font = workbook.createFont();
+                font.setBold(true);
+                font.setColor(IndexedColors.RED.getIndex());
+                style.setFont(font);
+
+//                style.setFillForegroundColor(IndexedColors.RED.getIndex());
+//                style.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+//                style.setBorderBottom(BorderStyle.THICK);
+//                style.setBottomBorderColor(IndexedColors.YELLOW.getIndex());
+//                style.setBorderLeft(BorderStyle.THICK);
+//                style.setLeftBorderColor(IndexedColors.YELLOW.getIndex());
+//                style.setBorderRight(BorderStyle.THICK);
+//                style.setRightBorderColor(IndexedColors.YELLOW.getIndex());
+//                style.setBorderTop(BorderStyle.MEDIUM_DASHED);
+//                style.setTopBorderColor(IndexedColors.YELLOW.getIndex());
+                cellTotal.setCellStyle(style);
+                j++;
             }
-            Row rowFinal = sheet.createRow(i+2);
-            Cell cellTitre = rowFinal.createCell(3);
-            cellTitre.setCellValue("Total :");
-            Cell cellTotal = rowFinal.createCell(4);
-            cellTotal.setCellValue(total);
-            j++;
         }
+
+       /*
+        }*/
 
         workbook.write(response.getOutputStream());
         workbook.close();
